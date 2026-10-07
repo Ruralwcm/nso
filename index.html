@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NSO Miền Bắc v1.0</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --primary: #6d28d9; --primary-light: #8b5cf6; --bg: #f5f3ff; --card: #fff;
+  --text: #1f2937; --muted: #6b7280; --success: #16a34a; --warning: #d97706;
+  --danger: #dc2626; --border: #e5e7eb; --radius: 10px;
+}
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif; background:#f0f2f5; color:var(--text); min-height:100vh; }
+/* Header */
+.topbar { background:linear-gradient(135deg,var(--primary),var(--primary-light)); color:#fff; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+.topbar h1 { font-size:16px; font-weight:700; }
+.topbar .header-right { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+.topbar .user-info { font-size:12px; opacity:.9; display:flex; gap:12px; align-items:center; }
+.topbar .user-info button { background:rgba(255,255,255,.2); border:none; color:#fff; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:11px; }
+.topbar .update-date { font-size:10px; opacity:.7; }
+/* Login */
+.login-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:999; }
+.login-card { background:#fff; padding:28px; border-radius:var(--radius); width:340px; box-shadow:0 8px 32px rgba(0,0,0,.2); }
+.login-card .lock-icon { text-align:center; font-size:40px; margin-bottom:8px; }
+.login-card h2 { text-align:center; margin-bottom:20px; color:var(--primary); font-size:18px; }
+.login-card .input-group { margin-bottom:12px; position:relative; }
+.login-card .input-group label { font-size:12px; font-weight:600; color:var(--muted); display:block; margin-bottom:4px; }
+.login-card input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; transition:border .2s; }
+.login-card input:focus { outline:none; border-color:var(--primary); }
+.login-card .user-found { font-size:12px; color:var(--success); margin-top:4px; min-height:18px; }
+.login-card .user-found.error { color:var(--danger); }
+.login-card button { width:100%; padding:11px; background:var(--primary); color:#fff; border:none; border-radius:6px; font-size:14px; font-weight:600; cursor:pointer; margin-top:4px; transition:background .2s; }
+.login-card button:hover { background:var(--primary-light); }
+.login-card .error { color:var(--danger); font-size:12px; text-align:center; margin-top:8px; }
+/* Tabs */
+.nav-tabs { display:flex; background:#fff; border-bottom:2px solid var(--border); overflow-x:auto; position:sticky; top:52px; z-index:50; }
+.nav-tabs button { flex-shrink:0; padding:10px 14px; border:none; background:none; font-size:13px; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all .2s; white-space:nowrap; }
+.nav-tabs button.active { color:var(--primary); border-bottom-color:var(--primary); }
+.nav-tabs button .badge { display:inline-block; background:var(--danger); color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; margin-left:4px; }
+/* Main */
+.main { max-width:960px; margin:0 auto; padding:12px; }
+.section { display:none; }
+.section.active { display:block; }
+/* Cards */
+.card { background:var(--card); border-radius:var(--radius); padding:16px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.card h3 { font-size:14px; color:var(--primary); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+/* KPI Row */
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:12px; }
+.kpi-card { background:var(--card); border-radius:var(--radius); padding:14px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.kpi-num { font-size:28px; font-weight:800; }
+.kpi-label { font-size:11px; color:var(--muted); margin-top:4px; }
+.kpi-num.purple { color:var(--primary); }
+.kpi-num.green { color:var(--success); }
+.kpi-num.orange { color:var(--warning); }
+.kpi-num.red { color:var(--danger); }
+/* Form */
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; }
+.form-full { grid-column:1/-1; }
+label { font-size:12px; font-weight:600; color:var(--muted); display:block; margin-bottom:2px; }
+input, select, textarea { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px; background:#fafafa; }
+input:focus, select:focus, textarea:focus { outline:none; border-color:var(--primary); background:#fff; }
+textarea { resize:vertical; min-height:60px; }
+.btn { padding:8px 18px; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; }
+.btn-primary { background:var(--primary); color:#fff; }
+.btn-primary:hover { background:var(--primary-light); }
+.btn-success { background:var(--success); color:#fff; }
+.btn-outline { background:#fff; color:var(--primary); border:1px solid var(--primary); }
+.btn-sm { padding:4px 10px; font-size:11px; }
+/* Tables */
+table { width:100%; border-collapse:collapse; font-size:12px; }
+thead th { background:#f5f3ff; padding:7px 8px; text-align:left; font-weight:700; color:var(--primary); border-bottom:2px solid #c4b5fd; font-size:11px; position:sticky; top:0; }
+td { padding:6px 8px; border-bottom:1px solid #f3f0ff; }
+tr:hover td { background:#faf9ff; }
+.tag { display:inline-block; padding:2px 7px; border-radius:3px; font-size:10px; font-weight:600; }
+.tag-green { background:#dcfce7; color:var(--success); }
+.tag-orange { background:#fef3c7; color:var(--warning); }
+.tag-purple { background:#ede9fe; color:var(--primary); }
+.tag-red { background:#fee2e2; color:var(--danger); }
+/* Checklist */
+.chk-category { background:#ede9fe; color:var(--primary); font-weight:700; padding:8px 12px; border-radius:6px 6px 0 0; font-size:13px; display:flex; justify-content:space-between; align-items:center; }
+.chk-items { border:1px solid var(--border); border-top:none; border-radius:0 0 6px 6px; }
+.chk-row { display:flex; align-items:center; padding:8px 12px; border-bottom:1px solid #f3f0ff; font-size:12px; gap:8px; }
+.chk-row:last-child { border-bottom:none; }
+.chk-row .chk-name { flex:1; }
+.chk-row .chk-time { font-size:10px; color:var(--muted); min-width:50px; text-align:center; }
+.chk-row input[type=checkbox] { width:18px; height:18px; accent-color:var(--success); }
+.chk-row .chk-note { font-size:10px; color:var(--muted); max-width:160px; }
+.progress-bar { height:6px; background:#e5e7eb; border-radius:3px; overflow:hidden; margin-top:4px; }
+.progress-fill { height:100%; background:var(--success); border-radius:3px; transition:width .3s; }
+/* Responsive */
+@media(max-width:768px) {
+  .form-grid { grid-template-columns:1fr; }
+  .main { padding:8px; }
+  table { font-size:10px; }
+  thead th, td { padding:4px; }
+  .kpi-row { grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:480px) {
+  .nav-tabs button { padding:8px 10px; font-size:11px; }
+  .topbar h1 { font-size:14px; }
+  .kpi-row { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <h1>🏪 NSO Miền Bắc v1.0</h1>
+  </div>
+  <div class="header-right">
+    <div class="user-info">
+      <span id="userDisplay">Chưa đăng nhập</span>
+      <button onclick="doLogout()">Đăng xuất</button>
+    </div>
+    <div class="update-date">📅 Cập nhật dữ liệu: <span id="dataUpdateDate">07/10/2026</span></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="lock-icon">🔐</div>
+    <h2>Đăng nhập</h2>
+    <div class="input-group">
+      <label>Mã nhân viên</label>
+      <input type="text" id="loginCode" placeholder="Nhập mã nhân viên..." oninput="onCodeInput()" autocomplete="off">
+      <div class="user-found" id="userHint"></div>
+    </div>
+    <div class="input-group">
+      <label>Mật khẩu</label>
+      <input type="password" id="loginPass" placeholder="Nhập mật khẩu (SĐT)">
+    </div>
+    <button onclick="doLogin()">Đăng nhập</button>
+    <div class="error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="nav-tabs" id="navTabs">
+  <button data-tab="dashboard" class="active">📊 Dashboard</button>
+  <button data-tab="scan">🗺 Scan QH</button>
+  <button data-tab="tkmb">📋 TKMB</button>
+  <button data-tab="checklist">✅ Checklist Mở Mới</button>
+  <button data-tab="damphan">🏢 Đàm phán DTKD</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- DASHBOARD -->
+<section class="section active" id="sec-dashboard">
+  <div class="kpi-row" id="dashKPI"></div>
+  <div class="card">
+    <h3>📋 MB Gần đây</h3>
+    <div style="overflow-x:auto"><table id="dashMBTable"><thead><tr><th>MB ID</th><th>GĐV</th><th>Tỉnh</th><th>Địa chỉ</th><th>DT(m²)</th><th>Giá</th><th>Trạng thái</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="card">
+    <h3>✅ Checklist NSO — Tiến độ</h3>
+    <div style="overflow-x:auto"><table id="dashChecklist"><thead><tr><th>NSO</th><th>GĐV</th><th>Ngày KT</th><th>Tiến độ</th><th>Hoàn thành</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- SCAN QH -->
+<section class="section" id="sec-scan">
+  <div class="card">
+    <h3>🔍 Scan điểm Quy Hoạch</h3>
+    <div class="form-grid">
+      <div><label>GĐV</label><select id="scanGDV" onchange="loadQLKV('scanGDV','scanQLKV')"><option value="">Chọn GĐV</option></select></div>
+      <div><label>QLKV</label><select id="scanQLKV"><option value="">Chọn QLKV</option></select></div>
+      <div><label>Chọn điểm QH</label><select id="scanQH"><option value="">Chọn điểm QH</option></select></div>
+      <div><label>Ngày scan</label><input type="date" id="scanDate"></div>
+      <div class="form-full"><label>Tình trạng khu vực</label><input type="text" id="scanArea" placeholder="VD: Đông dân, sầm uất, gần chợ..."></div>
+      <div class="form-full"><label>Có MB tiềm năng?</label><select id="scanHasMB"><option value="">-- Chọn --</option><option value="yes">✅ Có</option><option value="no">❌ Không</option></select></div>
+      <div class="form-full" id="scanMBReason" style="display:none"><label>Lý do không tìm được MB</label><input type="text" id="scanNoReason" placeholder="Không có MB trống, giá cao, vị trí xấu..."></div>
+      <div id="scanDraftMB" style="display:none; display:grid; grid-template-columns:1fr 1fr; gap:8px 16px;" class="form-full">
+        <div><label>Địa chỉ MB</label><input type="text" id="scanAddr"></div>
+        <div><label>Diện tích (m²)</label><input type="number" id="scanArea_m2"></div>
+        <div><label>Mặt tiền (m)</label><input type="text" id="scanFront"></div>
+        <div><label>Giá thuê (tr/th)</label><input type="number" id="scanPrice"></div>
+        <div><label>Chủ nhà - Tên</label><input type="text" id="scanOwner"></div>
+        <div><label>Chủ nhà - SĐT</label><input type="text" id="scanPhone"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:12px" onclick="saveScan()">💾 Lưu kết quả Scan</button>
+  </div>
+  <div class="card">
+    <h3>📜 Lịch sử Scan</h3>
+    <div style="overflow-x:auto"><table id="scanHistory"><thead><tr><th>Ngày</th><th>Điểm QH</th><th>GĐV</th><th>QLKV</th><th>Kết quả</th><th>Ghi chú</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- TKMB -->
+<section class="section" id="sec-tkmb">
+  <div class="card">
+    <h3>📋 Form Tiếp Nhận Mặt Bằng</h3>
+    <div class="form-grid">
+      <div><label>GĐV</label><select id="mbGDV" onchange="loadQLKV('mbGDV','mbQLKV')"><option value="">Chọn GĐV</option></select></div>
+      <div><label>QLKV</label><select id="mbQLKV"><option value="">Chọn QLKV</option></select></div>
+      <div><label>Họ tên người GT</label><input type="text" id="mbGTName"></div>
+      <div><label>Chức vụ</label><select id="mbGTChucVu"><option value="">Chọn</option><option>QLKV</option><option>CHT</option><option>QLKV TS</option><option>QLKVTS</option></select></div>
+      <div><label>Mã NV</label><input type="text" id="mbNV"></div>
+      <div><label>Tỉnh/TP</label><input type="text" id="mbTinh"></div>
+      <div><label>Huyện/Quận</label><input type="text" id="mbHuyen"></div>
+      <div class="form-full"><label>Địa chỉ chi tiết</label><input type="text" id="mbAddress"></div>
+      <div class="form-full"><label>Link Map</label><input type="text" id="mbMap"></div>
+      <div><label>Diện tích (m²)</label><input type="number" id="mbArea"></div>
+      <div><label>Mặt tiền (m)</label><input type="text" id="mbFront"></div>
+      <div><label>Giá thuê (tr/th)</label><input type="number" id="mbPrice"></div>
+      <div><label>Thanh toán</label><select id="mbPay"><option>3 tháng/lần</option><option>6 tháng/lần</option><option>12 tháng/lần</option><option>Đàm phán</option></select></div>
+      <div><label>Tiền cọc</label><input type="text" id="mbDeposit" value="1 tháng"></div>
+      <div><label>Thời hạn thuê</label><input type="text" id="mbTerm" value="5-8 năm"></div>
+      <div><label>Pháp lý</label><select id="mbLegal"><option>Sổ đỏ chính chủ</option><option>Sổ Hồng</option><option>Sổ đỏ</option><option>Có giấy tờ pháp lý</option></select></div>
+      <div class="form-full"><label>Hiện trạng</label><input type="text" id="mbStatus" placeholder="VD: Nhà mái tôn, WCM cải tạo..."></div>
+      <div><label>BCT - Tên</label><input type="text" id="mbBCTName"></div>
+      <div><label>BCT - SĐT</label><input type="text" id="mbBCTPhone"></div>
+    </div>
+    <div style="margin-top:12px; display:flex; gap:8px; align-items:center;">
+      <button class="btn btn-primary" onclick="saveMB()">💾 Lưu MB Draft</button>
+      <span style="font-size:12px; color:var(--muted)">MB ID tự sinh: <strong id="mbPreview">MB-YYYYMMDD-NNN</strong></span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📊 Danh sách MB</h3>
+    <div style="overflow-x:auto"><table id="mbTable"><thead><tr><th>MB ID</th><th>GĐV</th><th>QLKV</th><th>Tỉnh</th><th>Địa chỉ</th><th>DT</th><th>Giá</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- CHECKLIST MỞ MỚI -->
+<section class="section" id="sec-checklist">
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <div><label>Chọn NSO</label><select id="chkNSO" onchange="renderChecklist()"><option value="">-- Chọn NSO để xem checklist --</option></select></div>
+      <div><label>Ngày khai trương</label><input type="date" id="chkDate" onchange="renderChecklist()" style="width:auto"></div>
+    </div>
+  </div>
+  <div id="checklistContainer"></div>
+</section>
+
+<!-- ĐÀM PHÁN DTKD -->
+<section class="section" id="sec-damphan">
+  <div class="card">
+    <h3>🔍 Danh sách CH cần mở rộng DTKD</h3>
+    <div style="font-size:12px; color:var(--muted); margin-bottom:8px">CH có "Mặt tiền nhỏ" hoặc "DTKD nhỏ" được đánh dấu cần đàm phán mở rộng</div>
+    <div style="overflow-x:auto"><table id="dpTable"><thead><tr><th>Mã SAP</th><th>Tên CH</th><th>GĐV</th><th>MT(m)</th><th>DTKD(m²)</th><th>DT</th><th>MT đánh giá</th><th>DTKD đánh giá</th><th>TT đàm phán</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="card" id="dpForm" style="display:none">
+    <h3>📝 Cập nhật đàm phán</h3>
+    <div class="form-grid">
+      <div><label>CH</label><input type="text" id="dpCH" readonly></div>
+      <div><label>Tiến độ đàm phán</label><select id="dpProgress"><option>Đã liên hệ</option><option>Đang thương lượng</option><option>Đã chốt giá</option><option>Đã ký HĐ</option><option>Thất bại</option></select></div>
+      <div><label>DTKD mục tiêu (m²)</label><input type="number" id="dpTarget"></div>
+      <div><label>Giá thuê thêm (tr/th)</label><input type="number" id="dpExtraPrice"></div>
+      <div class="form-full"><label>Ghi chú</label><textarea id="dpNote" placeholder="Thông tin mặt bằng kế bên, kết quả trao đổi..."></textarea></div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="saveDamPhan()">💾 Lưu</button>
+  </div>
+</section>
+
+</div>
+
+<script>
+// ====== CONSTANTS ======
+const APP_VERSION = '1.0';
+const DATA_UPDATE_DATE = '07/10/2026';
+
+const USERS = [
+  {rank:'GĐV',name:'Phạm Minh Thu',code:'928615',phone:'12345678',gdv:'Phạm Minh Thu'},
+  {rank:'GĐV',name:'Lê Thị Hồng Thu',code:'960421',phone:'12345678',gdv:'Lê Thị Hồng Thu'},
+  {rank:'GĐV',name:'Tạ Công Nhận',code:'961088',phone:'12345678',gdv:'Tạ Công Nhận'},
+  {rank:'GĐV',name:'Bùi Thị Thu Nhài',code:'976644',phone:'12345678',gdv:'Bùi Thị Thu Nhài'},
+  {rank:'GĐV',name:'Nguyễn Mạnh Sơn',code:'965799',phone:'12345678',gdv:'Nguyễn Mạnh Sơn'},
+  {rank:'GĐV',name:'Hồ Nam',code:'960668',phone:'12345678',gdv:'Hồ Nam'},
+  {rank:'GĐV',name:'Nguyễn Duy Đoàn',code:'976998',phone:'12345678',gdv:'Nguyễn Duy Đoàn'},
+  {rank:'GĐV',name:'Đặng Văn Dũng',code:'3004544',phone:'12345678',gdv:'Đặng Văn Dũng'},
+  {rank:'GĐV',name:'Dương Tùng',code:'3604641',phone:'12345678',gdv:'Dương Tùng'},
+  {rank:'GĐV',name:'Tạ Quốc Huy',code:'309425',phone:'12345678',gdv:'Tạ Quốc Huy'},
+  {rank:'GĐM',name:'Đặng Trần Hảo',code:'963956',phone:'12345678',gdv:'Đặng Trần Hảo'}
+];
+
+const QH_SAMPLES = [
+  {code:'BKN_BK1',tinh:'T. Bắc Kạn',gdv:'Hồ Nam',qlkv:'Nguyễn Thị Thanh Tâm',uuTien:'Ưu tiên'},
+  {code:'BKN_CĐ1',tinh:'T. Bắc Kạn',gdv:'Hồ Nam',qlkv:'Nguyễn Thị Thanh Tâm',uuTien:'Ưu tiên'},
+  {code:'CBG_CB1',tinh:'T. Cao Bằng',gdv:'Hồ Nam',qlkv:'Nguyễn Thị Thanh Tâm',uuTien:'Ưu tiên'},
+  {code:'CBG_BLA1',tinh:'T. Cao Bằng',gdv:'Hồ Nam',qlkv:'Trịnh Thanh Bình',uuTien:'Ưu tiên'},
+  {code:'HGG_HG1',tinh:'T. Hà Giang',gdv:'Nguyễn Mạnh Sơn',qlkv:'Trịnh Thanh Bình',uuTien:'Ưu tiên'},
+  {code:'LCI_LC1',tinh:'T. Lai Châu',gdv:'Nguyễn Mạnh Sơn',qlkv:'Bùi Anh Vũ',uuTien:'Ưu tiên'},
+  {code:'PTO_PT1',tinh:'T. Phú Thọ',gdv:'Hồ Nam',qlkv:'Nguyễn Thị Hải',uuTien:'Ưu tiên'},
+  {code:'VPC_VP1',tinh:'T. Vĩnh Phúc',gdv:'Hồ Nam',qlkv:'Nguyễn Thị Ngoan',uuTien:'Ưu tiên'},
+  {code:'TNN_TN1',tinh:'T. Thái Nguyên',gdv:'Hồ Nam',qlkv:'Đỗ Hải Võ',uuTien:'Ưu tiên'},
+  {code:'HNM_HN1',tinh:'T. Hà Nam',gdv:'Đặng Văn Dũng',qlkv:'Cao Minh Dương',uuTien:'Ưu tiên'},
+];
+
+const DP_SAMPLES = [
+  {sap:'6613',ch:'WM+ HNI 35 Đông Khê',gdv:'Bùi Thị Thu Nhài',mt:9.5,dtkd:82,dt:18.22,mtDG:'Đạt',dtkdDG:'DTKD nhỏ'},
+  {sap:'6486',ch:'WM+ HNI 165 Hồng Hà',gdv:'Bùi Thị Thu Nhài',mt:5.9,dtkd:78,dt:20.10,mtDG:'Mặt tiền nhỏ',dtkdDG:'DTKD nhỏ'},
+  {sap:'5497',ch:'WM+ HBH 665 Cù Chính Lan',gdv:'Dương Tùng',mt:5.9,dtkd:89.1,dt:21.40,mtDG:'Mặt tiền nhỏ',dtkdDG:'DTKD nhỏ'},
+  {sap:'4954',ch:'WM+ HNM 173 Lê Công Thanh',gdv:'Đặng Văn Dũng',mt:9.2,dtkd:110,dt:41.19,mtDG:'Đạt',dtkdDG:'DTKD nhỏ'},
+  {sap:'2AD6',ch:'WM+ NBH Văn Lâm, Hoa Lư',gdv:'Đặng Văn Dũng',mt:5.72,dtkd:94,dt:31.48,mtDG:'Mặt tiền nhỏ',dtkdDG:'DTKD nhỏ'},
+  {sap:'6281',ch:'WM+ PTO 425-427 Lạc Long Quân',gdv:'Hồ Nam',mt:6.36,dtkd:100,dt:43.32,mtDG:'Mặt tiền nhỏ',dtkdDG:'DTKD nhỏ'},
+  {sap:'2AA2',ch:'WM+ HNI Yên Bài, Mê Linh',gdv:'Phạm Minh Thu',mt:5.85,dtkd:91,dt:18.33,mtDG:'Mặt tiền nhỏ',dtkdDG:'Đạt'},
+  {sap:'5146',ch:'WM+ HYN Thôn Trương Xá',gdv:'Nguyễn Duy Đoàn',mt:6.8,dtkd:81.7,dt:25.43,mtDG:'Mặt tiền nhỏ',dtkdDG:'DTKD nhỏ'},
+];
+
+// ====== STATE ======
+let currentUser = null;
+let scans = JSON.parse(localStorage.getItem('nso_scans')||'[]');
+let mbs = JSON.parse(localStorage.getItem('nso_mbs')||'[]');
+let checklists = JSON.parse(localStorage.getItem('nso_checklists')||'{}');
+let damphans = JSON.parse(localStorage.getItem('nso_damphans')||'{}');
+
+// ====== LOGIN ======
+function onCodeInput() {
+  const code = document.getElementById('loginCode').value.trim();
+  const hint = document.getElementById('userHint');
+  hint.classList.remove('error');
+  if (!code) { hint.textContent = ''; return; }
+  const u = USERS.find(x => x.code === code);
+  if (u) {
+    hint.textContent = `👋 ${u.name} (${u.rank})`;
+    hint.classList.remove('error');
+  } else {
+    hint.textContent = '❌ Không tìm thấy mã nhân viên';
+    hint.classList.add('error');
+  }
+}
+
+function doLogin() {
+  const code = document.getElementById('loginCode').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const u = USERS.find(x => x.code === code && x.phone === pass);
+  if (!u) { document.getElementById('loginError').textContent = 'Sai mã NV hoặc mật khẩu!'; return; }
+  currentUser = u;
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('userDisplay').textContent = `${u.name} (${u.rank})`;
+  document.getElementById('loginError').textContent = '';
+  init();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('userDisplay').textContent = 'Chưa đăng nhập';
+  document.getElementById('loginCode').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('userHint').textContent = '';
+}
+
+// ====== INIT ======
+function init() {
+  document.getElementById('dataUpdateDate').textContent = DATA_UPDATE_DATE;
+  populateGDVSelects();
+  renderDashboard();
+  renderScanHistory();
+  renderMBTable();
+  renderDPTable();
+  updateMBPreview();
+}
+function populateGDVSelects() {
+  const gdvs = [...new Set(USERS.filter(u=>u.rank==='GĐV').map(u=>u.name))];
+  ['scanGDV','mbGDV'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.innerHTML = '<option value="">Chọn GĐV</option>';
+    gdvs.forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; sel.appendChild(o); });
+  });
+}
+
+// ====== TABS ======
+document.getElementById('navTabs').addEventListener('click', function(e) {
+  if (e.target.tagName === 'BUTTON') {
+    document.querySelectorAll('#navTabs button').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-' + e.target.dataset.tab).classList.add('active');
+    if (e.target.dataset.tab === 'dashboard') renderDashboard();
+    if (e.target.dataset.tab === 'tkmb') { renderMBTable(); updateMBPreview(); }
+    if (e.target.dataset.tab === 'damphan') renderDPTable();
+    if (e.target.dataset.tab === 'scan') { populateScanQH(); renderScanHistory(); }
+    if (e.target.dataset.tab === 'checklist') populateChkNSO();
+  }
+});
+
+function loadQLKV(gdvId, qlkvId) {
+  const gdv = document.getElementById(gdvId).value;
+  const sel = document.getElementById(qlkvId);
+  sel.innerHTML = '<option value="">Chọn QLKV</option>';
+  const qlkvs = [...new Set(QH_SAMPLES.filter(q=>q.gdv===gdv).map(q=>q.qlkv))];
+  qlkvs.forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; sel.appendChild(o); });
+  if (gdvId === 'scanGDV') populateScanQH();
+}
+
+function populateScanQH() {
+  const gdv = document.getElementById('scanGDV').value;
+  const qlkv = document.getElementById('scanQLKV').value;
+  const sel = document.getElementById('scanQH');
+  sel.innerHTML = '<option value="">Chọn điểm QH</option>';
+  let qhs = QH_SAMPLES;
+  if (gdv) qhs = qhs.filter(q => q.gdv === gdv);
+  if (qlkv) qhs = qhs.filter(q => q.qlkv === qlkv);
+  qhs.forEach(q => { const o = document.createElement('option'); o.value = q.code; o.textContent = `${q.code} - ${q.tinh} [${q.uuTien}]`; sel.appendChild(o); });
+}
+
+document.getElementById('scanHasMB').addEventListener('change', function() {
+  document.getElementById('scanMBReason').style.display = this.value === 'no' ? 'block' : 'none';
+  document.getElementById('scanDraftMB').style.display = this.value === 'yes' ? 'grid' : 'none';
+});
+
+// ====== SCAN ======
+function saveScan() {
+  if (!currentUser) return alert('Vui lòng đăng nhập!');
+  const scan = {
+    date: document.getElementById('scanDate').value,
+    qhCode: document.getElementById('scanQH').value,
+    gdv: document.getElementById('scanGDV').value,
+    qlkv: document.getElementById('scanQLKV').value,
+    areaStatus: document.getElementById('scanArea').value,
+    hasMB: document.getElementById('scanHasMB').value,
+    noReason: document.getElementById('scanNoReason').value,
+    mbAddr: document.getElementById('scanHasMB').value==='yes' ? document.getElementById('scanAddr').value : '',
+    mbArea: document.getElementById('scanHasMB').value==='yes' ? document.getElementById('scanArea_m2').value : '',
+    mbFront: document.getElementById('scanHasMB').value==='yes' ? document.getElementById('scanFront').value : '',
+    mbPrice: document.getElementById('scanHasMB').value==='yes' ? document.getElementById('scanPrice').value : '',
+    mbOwner: document.getElementById('scanHasMB').value==='yes' ? document.getElementById('scanOwner').value : '',
+    mbPhone: document.getElementById('scanHasMB').value==='yes' ? document.getElementById('scanPhone').value : '',
+    scannedBy: currentUser.name,
+    time: new Date().toISOString()
+  };
+  scans.unshift(scan);
+  localStorage.setItem('nso_scans', JSON.stringify(scans));
+  renderScanHistory();
+  document.getElementById('scanDate').value = ''; document.getElementById('scanArea').value = '';
+  document.getElementById('scanHasMB').value = ''; document.getElementById('scanNoReason').value = '';
+  alert('✅ Đã lưu kết quả scan!');
+}
+
+function renderScanHistory() {
+  const tbody = document.querySelector('#scanHistory tbody');
+  tbody.innerHTML = scans.slice(0,20).map(s => `<tr>
+    <td>${s.date}</td><td>${s.qhCode}</td><td>${s.gdv}</td><td>${s.qlkv}</td>
+    <td>${s.hasMB==='yes'?'✅ Có MB':'❌ Không'}</td>
+    <td>${s.noReason||s.mbAddr||''}</td>
+  </tr>`).join('');
+}
+
+// ====== TKMB ======
+function updateMBPreview() {
+  const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const cnt = mbs.filter(m => m.id && m.id.startsWith('MB-'+today)).length + 1;
+  document.getElementById('mbPreview').textContent = `MB-${today}-${String(cnt).padStart(3,'0')}`;
+}
+
+function saveMB() {
+  if (!currentUser) return alert('Vui lòng đăng nhập!');
+  const today = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const cnt = mbs.filter(m => m.id && m.id.startsWith('MB-'+today)).length + 1;
+  const mb = {
+    id: `MB-${today}-${String(cnt).padStart(3,'0')}`,
+    gdv: document.getElementById('mbGDV').value,
+    qlkv: document.getElementById('mbQLKV').value,
+    gtName: document.getElementById('mbGTName').value,
+    gtChucVu: document.getElementById('mbGTChucVu').value,
+    maNV: document.getElementById('mbNV').value,
+    tinh: document.getElementById('mbTinh').value,
+    huyen: document.getElementById('mbHuyen').value,
+    address: document.getElementById('mbAddress').value,
+    map: document.getElementById('mbMap').value,
+    area: document.getElementById('mbArea').value,
+    front: document.getElementById('mbFront').value,
+    price: document.getElementById('mbPrice').value,
+    pay: document.getElementById('mbPay').value,
+    deposit: document.getElementById('mbDeposit').value,
+    term: document.getElementById('mbTerm').value,
+    legal: document.getElementById('mbLegal').value,
+    hienTrang: document.getElementById('mbStatus').value,
+    bctName: document.getElementById('mbBCTName').value,
+    bctPhone: document.getElementById('mbBCTPhone').value,
+    status: 'Draft',
+    createdBy: currentUser.name,
+    createdAt: new Date().toISOString()
+  };
+  mbs.unshift(mb);
+  localStorage.setItem('nso_mbs', JSON.stringify(mbs));
+  renderMBTable();
+  updateMBPreview();
+  alert('✅ Đã lưu MB ' + mb.id);
+}
+
+function renderMBTable() {
+  const tbody = document.querySelector('#mbTable tbody');
+  const statusTag = s => s==='GDM duyet'?'tag-green':s==='GDV duyet'?'tag-purple':'tag-orange';
+  tbody.innerHTML = mbs.slice(0,30).map(m => `<tr>
+    <td><strong>${m.id}</strong></td><td>${m.gdv}</td><td>${m.qlkv}</td><td>${m.tinh}</td>
+    <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.address}</td>
+    <td>${m.area}</td><td>${m.price}tr</td>
+    <td><span class="tag ${statusTag(m.status)}">${m.status}</span></td>
+    <td><button class="btn btn-sm btn-outline" onclick="approveMB('${m.id}','GDV duyet')">GĐV duyệt</button>
+        <button class="btn btn-sm btn-success" onclick="approveMB('${m.id}','GDM duyet')">GĐM duyệt</button></td>
+  </tr>`).join('') || '<tr><td colspan="9" style="text-align:center;color:var(--muted)">Chưa có MB nào</td></tr>';
+}
+
+function approveMB(id, newStatus) {
+  if (!currentUser) return alert('Vui lòng đăng nhập!');
+  const mb = mbs.find(m => m.id === id);
+  if (!mb) return;
+  if (newStatus === 'GDV duyet' && currentUser.rank !== 'GĐV' && currentUser.rank !== 'GĐM') return alert('Chỉ GĐV/GĐM được duyệt!');
+  if (newStatus === 'GDM duyet' && currentUser.rank !== 'GĐM') return alert('Chỉ GĐM được duyệt!');
+  mb.status = newStatus;
+  if (newStatus === 'GDM duyet') {
+    mb.approvedAt = new Date().toISOString();
+    if (!checklists[mb.id]) checklists[mb.id] = { nsos: [] };
+  }
+  localStorage.setItem('nso_mbs', JSON.stringify(mbs));
+  renderMBTable();
+}
+
+// ====== CHECKLIST ======
+function populateChkNSO() {
+  const sel = document.getElementById('chkNSO');
+  sel.innerHTML = '<option value="">-- Chọn NSO --</option>';
+  const approved = mbs.filter(m => m.status === 'GDM duyet');
+  if (approved.length === 0) {
+    sel.innerHTML += '<option disabled>Chưa có MB được GĐM duyệt</option>';
+    return;
+  }
+  approved.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m.id;
+    o.textContent = `${m.id} — ${m.address} (${m.gdv})`;
+    sel.appendChild(o);
+  });
+}
+
+const CHECKLIST_TEMPLATE = [
+  {cat:'👥 Nhân sự',items:[
+    {name:'Tiêu chuẩn nhân sự CH khai trương',time:'D-15',note:'CHT cũ chuyển sang KT; NVBH đảm bảo đủ'}]},
+  {cat:'📦 Hàng hóa',items:[
+    {name:'Đặt hàng Ambiant theo đơn mẫu NSO',time:'D-24',note:'600-700 hộ: KT 700-800M mặt hàng'},
+    {name:'Rà soát CTKM và FC nhóm SKU Key',time:'D-14',note:''},
+    {name:'Đặt hàng rau, thịt, trái cây',time:'D-14',note:'Đơn hàng mẫu theo Vùng'},
+    {name:'Luân chuyển hàng từ CH LFL,STU',time:'D-7',note:'Giảm tồn CH hiện hữu'},
+    {name:'Đặt hàng trực tiếp NCC',time:'D-10',note:'Cá hồi, bò mỹ, Sapo...'},
+    {name:'Trái cây / Fresh & Chill',time:'D-1',note:'Tồn kho tối thiểu mã key'},
+    {name:'Hóa mỹ phẩm / Sữa / TKP khô',time:'D-4',note:'Tồn kho tối thiểu mã key'},
+    {name:'BC đặt hàng nhóm CH NSO + BC độ phủ',time:'D-7',note:'Hồng build BC theo dõi'},
+  ]},
+  {cat:'📥 Nhận hàng & Nhập kho',items:[
+    {name:'Nhận hàng từ kho DC',time:'D-7',note:''},
+    {name:'Loha — Luân chuyển túi Loha',time:'D-7',note:'Tách riêng hàng bán + tặng'},
+    {name:'Nhận hàng từ NCC',time:'D-5',note:''},
+    {name:'Nhận hàng Đông - Mát',time:'D-4',note:''},
+    {name:'Nhận hàng luân chuyển',time:'D-4',note:'PALC KSĐH/hàng KM'},
+    {name:'Nhận hàng Fresh (Rau,thịt,trái cây)',time:'D-1',note:''},
+    {name:'Nhập kho & lưu trữ chứng từ',time:'D-7→D-1',note:''},
+  ]},
+  {cat:'📣 Marketing',items:[
+    {name:'Hoạt náo — Liên hệ NCC',time:'D-5',note:'Sapo, Masan, kem kido, LC, CJ'},
+    {name:'Quảng cáo Facebook',time:'D-5',note:'Dùng chung TK huyện/xã'},
+    {name:'Nhóm Zalo KHTT',time:'D-15',note:'Target 200 KH (D-7:150, D-2:200)'},
+    {name:'Treo Phướn khai trương + tuyển dụng',time:'D-15',note:'Add KH vào nhóm'},
+    {name:'Hội viên WIN',time:'D-15',note:''},
+    {name:'In Voucher giảm giá',time:'D-15',note:'Tối thiểu 1000 voucher rau/thịt'},
+    {name:'Cavassing — Phát tờ rơi',time:'D-10',note:'Phát 2 lần/nhà D-3; chợ 5 lần'},
+    {name:'Roadshow — 10 xe máy + cờ + loa',time:'D-5',note:'Bán kính 5km, 7h-8h & 16h-18h'},
+  ]},
+  {cat:'🏗️ Thiết bị & CSVC',items:[
+    {name:'Check nhận diện MB từ 2 phía',time:'D-14',note:'Đề xuất PA bổ sung nếu kém'},
+    {name:'Nhận bàn giao mặt bằng',time:'D-9',note:'Đầy đủ chìa khóa, ANAT'},
+    {name:'Nhận bàn giao giá kệ',time:'D-8',note:''},
+    {name:'Chuẩn bị POS thu ngân phụ',time:'D-7',note:'Mỗi tỉnh 1 POS'},
+    {name:'Camera — Nhận bàn giao',time:'D-5',note:''},
+    {name:'Tủ kem — 2 tủ',time:'D-5',note:''},
+    {name:'POSM, tờ rơi, phướn',time:'D-3',note:'Nhận từ NCC/HUB'},
+    {name:'Trang trí cửa hàng',time:'D-2',note:'Cờ, cờ nheo, điểm nhất'},
+  ]},
+  {cat:'🏬 Trưng bày',items:[
+    {name:'Up hàng — In layout + POG',time:'D-4',note:'Dán lên từng kệ, tb đúng POG'},
+    {name:'Bắn tem giá đầy đủ',time:'D-2',note:'Tem thường + khuyến mại'},
+  ]},
+  {cat:'🎉 Hoạt náo ngày KT',items:[
+    {name:'Cổng bóng full mặt tiền',time:'D-1',note:''},
+    {name:'Lều ≥80% chiều dài mặt tiền',time:'D-1',note:''},
+    {name:'Khay tối thiểu 80',time:'D-1',note:''},
+    {name:'Bóng bay 200-300 quả',time:'D-1',note:''},
+    {name:'Loa — Phát CTKM & nhạc',time:'D-5',note:''},
+  ]},
+  {cat:'🕯️ Cúng KT & Phân công',items:[
+    {name:'Cúng khai trương',time:'D-1',note:'Thầy cúng, bài vị, lễ vật'},
+    {name:'Nhân sự 8-10 người/ca',time:'D',note:''},
+    {name:'Thu ngân 4 NV/2 POS',time:'D',note:''},
+    {name:'Phân công mở thẻ HV WIN + KHTT',time:'D',note:''},
+  ]},
+  {cat:'🔍 Sau khai trương',items:[
+    {name:'Review tồn kho — Full hàng ra kệ',time:'D+3',note:''},
+    {name:'Rà soát nhóm Fresh điều chỉnh',time:'D+5',note:''},
+    {name:'Rà soát tồn cao — PA luân chuyển',time:'D+7',note:''},
+    {name:'Kiểm kê CH sau KT',time:'D+14',note:''},
+  ]},
+];
+
+function renderChecklist() {
+  const mbId = document.getElementById('chkNSO').value;
+  const ktDate = document.getElementById('chkDate').value;
+  const container = document.getElementById('checklistContainer');
+  if (!mbId) { container.innerHTML = '<div class="card" style="text-align:center;color:var(--muted)">Chọn NSO để xem checklist</div>'; return; }
+  
+  const data = checklists[mbId] || { items: {} };
+  
+  let html = '';
+  CHECKLIST_TEMPLATE.forEach(cat => {
+    const done = cat.items.filter(it => data.items && data.items[it.name]).length;
+    const pct = Math.round(done / cat.items.length * 100);
+    html += `<div class="card" style="padding:0;overflow:hidden">
+      <div class="chk-category">
+        <span>${cat.cat} (${done}/${cat.items.length})</span>
+        <div style="width:80px"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
+      </div>
+      <div class="chk-items">`;
+    cat.items.forEach(it => {
+      const checked = data.items && data.items[it.name] ? 'checked' : '';
+      html += `<div class="chk-row">
+        <input type="checkbox" ${checked} onchange="toggleChkItem('${mbId}','${it.name.replace(/'/g,"\\'")}',this.checked)">
+        <span class="chk-name">${it.name}</span>
+        <span class="chk-time">${it.time}</span>
+        <span class="chk-note">${it.note||''}</span>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  
+  const allItems = CHECKLIST_TEMPLATE.flatMap(c => c.items);
+  const allDone = allItems.filter(it => data.items && data.items[it.name]).length;
+  const allPct = Math.round(allDone / allItems.length * 100);
+  
+  html = `<div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-num purple">${allDone}/${allItems.length}</div><div class="kpi-label">Tổng checklist</div></div>
+    <div class="kpi-card"><div class="kpi-num green">${allPct}%</div><div class="kpi-label">Hoàn thành</div></div>
+    <div class="kpi-card"><div class="kpi-num orange">${ktDate||'Chưa set'}</div><div class="kpi-label">Ngày KT dự kiến</div></div>
+  </div>` + html;
+  
+  container.innerHTML = html;
+}
+
+function toggleChkItem(mbId, itemName, checked) {
+  if (!checklists[mbId]) checklists[mbId] = { items: {} };
+  if (checked) {
+    checklists[mbId].items[itemName] = new Date().toISOString();
+  } else {
+    delete checklists[mbId].items[itemName];
+  }
+  localStorage.setItem('nso_checklists', JSON.stringify(checklists));
+  renderChecklist();
+}
+
+// ====== ĐÀM PHÁN ======
+let selectedDP = null;
+function renderDPTable() {
+  const tbody = document.querySelector('#dpTable tbody');
+  tbody.innerHTML = DP_SAMPLES.map(d => {
+    const dp = damphans[d.sap];
+    return `<tr>
+      <td><strong>${d.sap}</strong></td><td>${d.ch}</td><td>${d.gdv}</td>
+      <td>${d.mt}</td><td>${d.dtkd}</td><td>${d.dt}tr</td>
+      <td><span class="tag ${d.mtDG==='Mặt tiền nhỏ'?'tag-red':'tag-green'}">${d.mtDG}</span></td>
+      <td><span class="tag ${d.dtkdDG==='DTKD nhỏ'?'tag-red':'tag-green'}">${d.dtkdDG}</span></td>
+      <td>${dp ? `<span class="tag tag-purple">${dp.progress}</span>` : '<span class="tag tag-orange">Chưa ĐP</span>'}
+          <button class="btn btn-sm btn-outline" onclick="openDP('${d.sap}')">Cập nhật</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function openDP(sap) {
+  selectedDP = sap;
+  const d = DP_SAMPLES.find(x => x.sap === sap);
+  document.getElementById('dpCH').value = d.ch;
+  const dp = damphans[sap];
+  document.getElementById('dpProgress').value = dp ? dp.progress : 'Đã liên hệ';
+  document.getElementById('dpTarget').value = dp ? dp.target : '';
+  document.getElementById('dpExtraPrice').value = dp ? dp.extraPrice : '';
+  document.getElementById('dpNote').value = dp ? dp.note : '';
+  document.getElementById('dpForm').style.display = 'block';
+}
+
+function saveDamPhan() {
+  damphans[selectedDP] = {
+    progress: document.getElementById('dpProgress').value,
+    target: document.getElementById('dpTarget').value,
+    extraPrice: document.getElementById('dpExtraPrice').value,
+    note: document.getElementById('dpNote').value,
+    updatedBy: currentUser.name,
+    updatedAt: new Date().toISOString()
+  };
+  localStorage.setItem('nso_damphans', JSON.stringify(damphans));
+  renderDPTable();
+  document.getElementById('dpForm').style.display = 'none';
+  alert('✅ Đã lưu tiến độ đàm phán!');
+}
+
+// ====== DASHBOARD ======
+function renderDashboard() {
+  const approved = mbs.filter(m => m.status === 'GDM duyet').length;
+  const pending = mbs.filter(m => m.status !== 'GDM duyet').length;
+  const totalScans = scans.length;
+  const totalMBs = mbs.length;
+  
+  document.getElementById('dashKPI').innerHTML = `
+    <div class="kpi-card"><div class="kpi-num purple">${totalMBs}</div><div class="kpi-label">🏆 Tổng MB</div></div>
+    <div class="kpi-card"><div class="kpi-num green">${approved}</div><div class="kpi-label">✅ GĐM duyệt</div></div>
+    <div class="kpi-card"><div class="kpi-num orange">${pending}</div><div class="kpi-label">⏳ Chờ duyệt</div></div>
+    <div class="kpi-card"><div class="kpi-num red">${totalScans}</div><div class="kpi-label">🔍 Scan QH</div></div>
+  `;
+  
+  const statusTag = s => s==='GDM duyet'?'tag-green':s==='GDV duyet'?'tag-purple':'tag-orange';
+  document.querySelector('#dashMBTable tbody').innerHTML = mbs.slice(0,10).map(m => `<tr>
+    <td><strong>${m.id}</strong></td><td>${m.gdv}</td><td>${m.tinh}</td>
+    <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.address}</td>
+    <td>${m.area}</td><td>${m.price}tr</td>
+    <td><span class="tag ${statusTag(m.status)}">${m.status}</span></td>
+  </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted)">Chưa có MB</td></tr>';
+  
+  document.querySelector('#dashChecklist tbody').innerHTML = mbs.filter(m=>m.status==='GDM duyet').map(m=>{
+    const data = checklists[m.id];
+    const allItems = CHECKLIST_TEMPLATE.flatMap(c=>c.items);
+    const done = allItems.filter(it => data && data.items && data.items[it.name]).length;
+    const pct = Math.round(done/allItems.length*100);
+    return `<tr><td>${m.id}</td><td>${m.gdv}</td><td>Chưa set</td><td><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></td><td>${pct}%</td></tr>`;
+  }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted)">Chưa có NSO</td></tr>';
+}
+
+// ====== BOOT ======
+init();
+</script>
+</body>
+</html>
