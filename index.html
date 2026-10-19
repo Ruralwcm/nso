@@ -12,7 +12,7 @@
 :root {
   --primary: #1a3c6e; --primary-light: #1a3c6e; --primary-bg: #e8f0fe;
   --bg: #f8f9fb; --card: #fff; --text: #1f2937; --muted: #6b7280;
-  --success: #1a3c6e; --warning: #1a3c6e; --danger: #dc2626;
+  --success: #16a34a; --warning: #ffc107; --danger: #dc2626;
   --pending: #2563eb; --border: #e5e7eb; --radius: 12px;
   --shadow: 0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.06);
 }
@@ -108,13 +108,13 @@ tr:hover td { background:#faf9ff; }
 
 /* ─── TAGS ─── */
 .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; letter-spacing:.2px; }
-.tag-g { background:#e8f0fe; color:#1a3c6e; } .tag-o { background:#fef9c3; color:#1a3c6e; }
+.tag-g { background:#dcfce7; color:#15803d; } .tag-o { background:#fef9c3; color:#ffc107; }
 .tag-p { background:#dbeafe; color:#1d4ed8; } .tag-r { background:#fee2e2; color:#b91c1c; }
 .tag-gray { background:#f3f4f6; color:var(--muted); }
 
 .sla-badge { font-size:9px; padding:1px 5px; border-radius:3px; font-weight:600; }
-.sla-ok { background:#e8f0fe; color:#1a3c6e; }
-.sla-warn { background:#fef9c3; color:#1a3c6e; }
+.sla-ok { background:#dcfce7; color:#15803d; }
+.sla-warn { background:#fef9c3; color:#ffc107; }
 .sla-over { background:#fee2e2; color:#991b1b; }
 
 .mini-bar { height:5px; background:#e5e7eb; border-radius:3px; overflow:hidden; min-width:50px; }
@@ -128,7 +128,7 @@ tr:hover td { background:#faf9ff; }
 .step-node:hover { transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.08); }
 .step-node.None { background:#f3f4f6; color:var(--muted); border-color:#e5e7eb; }
 .step-node.Pending { background:#dbeafe; color:var(--pending); border-color:#93c5fd; }
-.step-node.Done { background:#e8f0fe; color:var(--success); border-color:#86efac; }
+.step-node.Done { background:#dcfce7; color:var(--success); border-color:#86efac; }
 .step-node.Fail { background:#fee2e2; color:var(--danger); border-color:#fca5a5; }
 .step-node.\— { background:#f3f4f6; color:#d1d5db; border-color:#e5e7eb; opacity:.5; }
 .step-node .sn { font-size:20px; display:block; margin-bottom:2px; }
@@ -161,7 +161,7 @@ tr:hover td { background:#faf9ff; }
 .filter-bar input:focus { outline:none; border-color:var(--primary-light); }
 
 /* ─── PENDING ALERT ─── */
-.pending-approval { background:#fffbeb; border:1px solid var(--warning); border-radius:8px; padding:10px 14px; margin:12px 0; font-size:11px; color:#1a3c6e; }
+.pending-approval { background:#fffbeb; border:1px solid var(--warning); border-radius:8px; padding:10px 14px; margin:12px 0; font-size:11px; color:#ffc107; }
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:768px) {
@@ -536,7 +536,7 @@ tr:hover td { background:#faf9ff; }
 </div>
 
 <script>
-// ═══ DATA ���══
+// ═══ DATA ═══
 const STEP_SLA = [
   { step:1, slaHours:24, slaLabel:'24h', desc:'QLKV/CHT gửi → GĐV duyệt' },
   { step:2, slaHours:48, slaLabel:'48h', desc:'TKMB khảo sát & lên BBTĐ → GĐ TKMB duyệt' },
@@ -871,8 +871,8 @@ function showSuccessToast(mbId) {
   const old = document.getElementById('successBanner'); if (old) old.remove();
   const banner = document.createElement('div');
   banner.id = 'successBanner';
-  banner.style.cssText = 'background:#e8f0fe;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
-  banner.innerHTML = '<div><strong style="color:#1a3c6e;font-size:14px">✅ Thành công — Chờ phê duyệt</strong><br><span style="font-size:12px;color:#1a3c6e">' + mbId + ' đã ghi nhận vào hệ thống · Chờ GĐV duyệt (B1) · SLA: 24h</span></div><button class="btn btn-sm btn-outline" onclick="this.parentElement.remove()">✕</button>';
+  banner.style.cssText = 'background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
+  banner.innerHTML = '<div><strong style="color:#15803d;font-size:14px">✅ Thành công — Chờ phê duyệt</strong><br><span style="font-size:12px;color:#166534">' + mbId + ' đã ghi nhận vào hệ thống · Chờ GĐV duyệt (B1) · SLA: 24h</span></div><button class="btn btn-sm btn-outline" onclick="this.parentElement.remove()">✕</button>';
   card.appendChild(banner);
   
   renderDash(); renderTienDo(); renderDSMB(); populateChkNSO();
