@@ -10,9 +10,9 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=IBM+Plex+Sans+Condensed:wght@400;600;700&display=swap');
 :root {
-  --primary: #7c3aed; --primary-light: #a78bfa; --primary-bg: #f5f3ff;
+  --primary: #1a3c6e; --primary-light: #1a3c6e; --primary-bg: #e8f0fe;
   --bg: #f8f9fb; --card: #fff; --text: #1f2937; --muted: #6b7280;
-  --success: #16a34a; --warning: #d97706; --danger: #dc2626;
+  --success: #1a3c6e; --warning: #1a3c6e; --danger: #dc2626;
   --pending: #2563eb; --border: #e5e7eb; --radius: 12px;
   --shadow: 0 1px 3px rgba(0,0,0,.04),0 1px 2px rgba(0,0,0,.06);
 }
@@ -21,7 +21,7 @@
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
 
 /* ─── TOPBAR ─── */
-.topbar { background:linear-gradient(135deg,#4c1d95,#7c3aed); color:#fff; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
+.topbar { background:linear-gradient(135deg,#1a3c6e,#1a3c6e); color:#fff; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
 .topbar h1 { font-size:17px; font-weight:700; letter-spacing:-.3px; }
 .topbar .meta { font-size:11px; opacity:.75; margin-top:2px; }
 .topbar .header-right { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
@@ -58,13 +58,13 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans
 @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
 
 /* ─── CARD ─── */
-.card { background:var(--card); border-radius:var(--radius); padding:18px; margin-bottom:14px; box-shadow:var(--shadow); border:1px solid #f0edf5; }
-.card h3 { font-size:14px; color:var(--primary); margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #f0edf5; display:flex; align-items:center; gap:8px; }
+.card { background:var(--card); border-radius:var(--radius); padding:18px; margin-bottom:14px; box-shadow:var(--shadow); border:1px solid #e8f0fe; }
+.card h3 { font-size:14px; color:var(--primary); margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #e8f0fe; display:flex; align-items:center; gap:8px; }
 .card h3 .sub { font-size:11px; color:var(--muted); font-weight:400; margin-left:auto; }
 
 /* ─── KPI ─── */
 .kpi { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:14px; }
-.kpi-card { background:var(--card); border-radius:var(--radius); padding:16px; text-align:center; box-shadow:var(--shadow); cursor:pointer; transition:.2s; border:1px solid #f0edf5; }
+.kpi-card { background:var(--card); border-radius:var(--radius); padding:16px; text-align:center; box-shadow:var(--shadow); cursor:pointer; transition:.2s; border:1px solid #e8f0fe; }
 .kpi-card:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,.08); }
 .kpi-num { font-size:30px; font-weight:800; letter-spacing:-.5px; }
 .kpi-label { font-size:11px; color:var(--muted); margin-top:4px; }
@@ -75,7 +75,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans
 .kpi-section h4 { font-size:12px; font-weight:700; color:var(--text); margin-bottom:8px; padding-left:8px; border-left:3px solid var(--primary); }
 
 /* ─── FORM ─── */
-.form-section-label { font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:.5px; margin:16px 0 10px; padding-bottom:6px; border-bottom:2px solid #ede9fe; display:flex; align-items:center; gap:6px; }
+.form-section-label { font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:.5px; margin:16px 0 10px; padding-bottom:6px; border-bottom:2px solid #e8f0fe; display:flex; align-items:center; gap:6px; }
 .form-section-label:first-child { margin-top:0; }
 
 .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
@@ -108,13 +108,13 @@ tr:hover td { background:#faf9ff; }
 
 /* ─── TAGS ─── */
 .tag { display:inline-block; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:600; letter-spacing:.2px; }
-.tag-g { background:#dcfce7; color:#15803d; } .tag-o { background:#fef3c7; color:#92400e; }
+.tag-g { background:#e8f0fe; color:#1a3c6e; } .tag-o { background:#fef9c3; color:#1a3c6e; }
 .tag-p { background:#dbeafe; color:#1d4ed8; } .tag-r { background:#fee2e2; color:#b91c1c; }
 .tag-gray { background:#f3f4f6; color:var(--muted); }
 
 .sla-badge { font-size:9px; padding:1px 5px; border-radius:3px; font-weight:600; }
-.sla-ok { background:#dcfce7; color:#15803d; }
-.sla-warn { background:#fef3c7; color:#92400e; }
+.sla-ok { background:#e8f0fe; color:#1a3c6e; }
+.sla-warn { background:#fef9c3; color:#1a3c6e; }
 .sla-over { background:#fee2e2; color:#991b1b; }
 
 .mini-bar { height:5px; background:#e5e7eb; border-radius:3px; overflow:hidden; min-width:50px; }
@@ -128,7 +128,7 @@ tr:hover td { background:#faf9ff; }
 .step-node:hover { transform:translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,.08); }
 .step-node.None { background:#f3f4f6; color:var(--muted); border-color:#e5e7eb; }
 .step-node.Pending { background:#dbeafe; color:var(--pending); border-color:#93c5fd; }
-.step-node.Done { background:#dcfce7; color:var(--success); border-color:#86efac; }
+.step-node.Done { background:#e8f0fe; color:var(--success); border-color:#86efac; }
 .step-node.Fail { background:#fee2e2; color:var(--danger); border-color:#fca5a5; }
 .step-node.\— { background:#f3f4f6; color:#d1d5db; border-color:#e5e7eb; opacity:.5; }
 .step-node .sn { font-size:20px; display:block; margin-bottom:2px; }
@@ -161,7 +161,7 @@ tr:hover td { background:#faf9ff; }
 .filter-bar input:focus { outline:none; border-color:var(--primary-light); }
 
 /* ─── PENDING ALERT ─── */
-.pending-approval { background:#fffbeb; border:1px solid var(--warning); border-radius:8px; padding:10px 14px; margin:12px 0; font-size:11px; color:#92400e; }
+.pending-approval { background:#fffbeb; border:1px solid var(--warning); border-radius:8px; padding:10px 14px; margin:12px 0; font-size:11px; color:#1a3c6e; }
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:768px) {
@@ -180,7 +180,7 @@ tr:hover td { background:#faf9ff; }
 }
 
 /* ─── SOURCE BADGE ─── */
-.src-badge { display:inline-flex; align-items:center; gap:4px; background:#ede9fe; color:var(--primary); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; }
+.src-badge { display:inline-flex; align-items:center; gap:4px; background:#e8f0fe; color:var(--primary); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; }
 
 /* ─── QH INFO ─── */
 .qh-info-mini { font-size:10px; color:var(--muted); margin-top:2px; }
@@ -536,7 +536,7 @@ tr:hover td { background:#faf9ff; }
 </div>
 
 <script>
-// ═══ DATA ═══
+// ═══ DATA ���══
 const STEP_SLA = [
   { step:1, slaHours:24, slaLabel:'24h', desc:'QLKV/CHT gửi → GĐV duyệt' },
   { step:2, slaHours:48, slaLabel:'48h', desc:'TKMB khảo sát & lên BBTĐ → GĐ TKMB duyệt' },
@@ -871,8 +871,8 @@ function showSuccessToast(mbId) {
   const old = document.getElementById('successBanner'); if (old) old.remove();
   const banner = document.createElement('div');
   banner.id = 'successBanner';
-  banner.style.cssText = 'background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
-  banner.innerHTML = '<div><strong style="color:#15803d;font-size:14px">✅ Thành công — Chờ phê duyệt</strong><br><span style="font-size:12px;color:#166534">' + mbId + ' đã ghi nhận vào hệ thống · Chờ GĐV duyệt (B1) · SLA: 24h</span></div><button class="btn btn-sm btn-outline" onclick="this.parentElement.remove()">✕</button>';
+  banner.style.cssText = 'background:#e8f0fe;border:1px solid #86efac;border-radius:8px;padding:14px 18px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
+  banner.innerHTML = '<div><strong style="color:#1a3c6e;font-size:14px">✅ Thành công — Chờ phê duyệt</strong><br><span style="font-size:12px;color:#1a3c6e">' + mbId + ' đã ghi nhận vào hệ thống · Chờ GĐV duyệt (B1) · SLA: 24h</span></div><button class="btn btn-sm btn-outline" onclick="this.parentElement.remove()">✕</button>';
   card.appendChild(banner);
   
   renderDash(); renderTienDo(); renderDSMB(); populateChkNSO();
@@ -1027,7 +1027,7 @@ function renderScanHistory(){document.querySelector('#scanHistory tbody').innerH
 const CHK_TEMPLATE=[{cat:'👥 Nhân sự',items:[{n:'Tiêu chuẩn nhân sự CH KT',t:'D-15'},{n:'Đào tạo NVBH',t:'D-10'}]},{cat:'📦 Hàng hóa',items:[{n:'Đặt hàng Ambiant',t:'D-24'},{n:'Rà soát CTKM',t:'D-14'},{n:'Đặt hàng Fresh',t:'D-7'},{n:'Luân chuyển hàng',t:'D-7'}]},{cat:'📣 Marketing',items:[{n:'Nhóm Zalo KHTT',t:'D-15'},{n:'Cavassing tờ rơi',t:'D-10'},{n:'Roadshow',t:'D-5'},{n:'Treo phướn KT',t:'D-15'}]},{cat:'🏗️ CSVC',items:[{n:'Nhận bàn giao MB',t:'D-9'},{n:'Nhận giá kệ',t:'D-8'},{n:'Camera',t:'D-5'},{n:'Trang trí CH',t:'D-2'}]},{cat:'🎉 Khai trương',items:[{n:'Cổng bóng',t:'D-1'},{n:'Lều + khay',t:'D-1'},{n:'Cúng KT',t:'D-1'},{n:'Nhân sự 8-10 người',t:'D'}]},];
 function populateChkNSO(){const sel=document.getElementById('chkNSO');sel.innerHTML='<option value="">-- Chọn MB đã KT --</option>';MB_DATA.filter(m=>m.steps[5].r==='Done').forEach(m=>{const o=document.createElement('option');o.value=m.id;o.textContent=m.id+' — '+m.addr+' ('+m.gdv+')';sel.appendChild(o);});}
 function renderChecklist(){const mbId=document.getElementById('chkNSO').value,container=document.getElementById('checklistContent');if(!mbId){container.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">Chọn MB đã KT để xem checklist</div>';return;}
-  container.innerHTML=CHK_TEMPLATE.map(cat=>`<div class="card" style="padding:0;overflow:hidden;margin-bottom:8px"><div style="background:#ede9fe;color:var(--primary);padding:8px 12px;font-weight:700;font-size:13px">${cat.cat}</div><div>${cat.items.map(it=>`<div style="display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid #f3f0ff;font-size:12px;gap:8px"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--success)" onchange="this.parentElement.style.textDecoration=this.checked?'line-through':''"><span style="flex:1">${it.n}</span><span style="font-size:10px;color:var(--muted);min-width:40px;text-align:right">${it.t}</span></div>`).join('')}</div></div>`).join('');}
+  container.innerHTML=CHK_TEMPLATE.map(cat=>`<div class="card" style="padding:0;overflow:hidden;margin-bottom:8px"><div style="background:#e8f0fe;color:var(--primary);padding:8px 12px;font-weight:700;font-size:13px">${cat.cat}</div><div>${cat.items.map(it=>`<div style="display:flex;align-items:center;padding:8px 12px;border-bottom:1px solid #f3f0ff;font-size:12px;gap:8px"><input type="checkbox" style="width:16px;height:16px;accent-color:var(--success)" onchange="this.parentElement.style.textDecoration=this.checked?'line-through':''"><span style="flex:1">${it.n}</span><span style="font-size:10px;color:var(--muted);min-width:40px;text-align:right">${it.t}</span></div>`).join('')}</div></div>`).join('');}
 
 // ═══ ĐÀM PHÁN ═══
 function renderDPTable(){document.querySelector('#dpTable tbody').innerHTML=DP_DATA.map(d=>`<tr><td><strong>${d.sap}</strong></td><td>${d.ch}</td><td>${d.gdv}</td><td>${d.mt}</td><td>${d.dtkd}</td><td>${d.dt}tr</td><td><span class="tag ${d.dg.includes('nhỏ')?'tag-r':'tag-o'}">${d.dg}</span></td><td><span class="tag ${d.td==='Đang thương lượng'?'tag-p':d.td==='Đã liên hệ'?'tag-o':'tag-gray'}">${d.td}</span></td><td><span class="sla-badge ${d.sla}">${d.sla==='ok'?'✅':'⚠️'}</span></td></tr>`).join('');}
